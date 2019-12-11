@@ -83,34 +83,27 @@ public class Main {
         String pass;
 
         try (Reader reader = new FileReader("users.json")) {
-
-            JSONObject jsonObject = (JSONObject) parser.parse(reader);
-            System.out.println(jsonObject);
-            BufferedReader br = new BufferedReader(new FileReader("users.json"));
-            try {
                 setKey(password);
                 Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey);
                 String userInput = Base64.getEncoder().encodeToString(cipher.doFinal(username.getBytes()));
                 String passInput = Base64.getEncoder().encodeToString(cipher.doFinal(password.getBytes()));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    user = (String)jsonObject.get("username");
-                    pass = (String)jsonObject.get("password");
-                    if(userInput.equals(user) && passInput.equals(pass)){
+            JSONObject[] jsonObject = (JSONObject[]) parser.parse(reader);
+            System.out.println(jsonObject);
+                for(int i = 0; i < jsonObject.length; i++){
+                    user = (String) jsonObject[i].get("username");
+                    pass = (String) jsonObject[i].get("password");
 
+                    // loop array
+                    JSONArray msg = (JSONArray) jsonObject[i].get("messages");
+                    Iterator<String> iterator = msg.iterator();
+                    while (iterator.hasNext()) {
+                        System.out.println(iterator.next());
                     }
+                if(userInput.equals(user) && passInput.equals(pass)) {
+                    System.out.println("YOU DID IT! You logged in!");
                 }
-            } finally {
-                br.close();
-            }
-
-            // loop array
-            JSONArray msg = (JSONArray) jsonObject.get("messages");
-            Iterator<String> iterator = msg.iterator();
-            while (iterator.hasNext()) {
-                System.out.println(iterator.next());
-            }
+                }
 
 
         } catch (IOException e) {
